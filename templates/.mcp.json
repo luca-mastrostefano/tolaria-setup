@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "codescene": {
+      "command": "cs-mcp",
+      "env": {
+        "CS_ACCESS_TOKEN": "${CS_ACCESS_TOKEN}"
+      }
+    }
+  }
+}

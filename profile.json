@@ -1,0 +1,72 @@
+{
+  "name": "tolaria-setup",
+  "version": "0.1.0",
+  "description": "Tolaria's agent-native engineering setup as a profile: direct-to-main TDD with a two-tier husky gate (lint pre-commit; build+coverage+smoke+CodeScene pre-push), ratcheted CodeScene thresholds, Codacy/Semgrep scans, an ADR system with /create-adr, Chunk sidecar lanes, and Todoist task-loop commands. Extracted from github.com/refactoringhq/tolaria.",
+  "tags": [
+    "tauri",
+    "react",
+    "rust",
+    "typescript",
+    "tdd",
+    "codescene",
+    "adr",
+    "desktop"
+  ],
+  "seed": [
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "docs/ARCHITECTURE.md",
+    "docs/ABSTRACTIONS.md",
+    "docs/GETTING-STARTED.md",
+    "docs/adr/README.md",
+    ".codescene-thresholds",
+    ".env.example",
+    "release-notes/TEMPLATE.md"
+  ],
+  "prompts": [
+    {
+      "name": "use_todoist",
+      "type": "confirm",
+      "message": "Wire the Todoist task-loop commands (/laputa-next-task, /laputa-done)?",
+      "default": false
+    },
+    {
+      "name": "todoist_open_section",
+      "type": "text",
+      "message": "Todoist section ID: Open (backlog)",
+      "default": "YOUR_OPEN_SECTION_ID",
+      "when": "answers.use_todoist"
+    },
+    {
+      "name": "todoist_rework_section",
+      "type": "text",
+      "message": "Todoist section ID: To Rework (failed QA)",
+      "default": "YOUR_REWORK_SECTION_ID",
+      "when": "answers.use_todoist"
+    },
+    {
+      "name": "todoist_inprogress_section",
+      "type": "text",
+      "message": "Todoist section ID: In Progress",
+      "default": "YOUR_IN_PROGRESS_SECTION_ID",
+      "when": "answers.use_todoist"
+    },
+    {
+      "name": "todoist_review_section",
+      "type": "text",
+      "message": "Todoist section ID: In Review",
+      "default": "YOUR_IN_REVIEW_SECTION_ID",
+      "when": "answers.use_todoist"
+    }
+  ],
+  "onboarding": [
+    "Wire the scripts the hooks call: `package.json` needs `lint`, `test`, `test:coverage`, `playwright:smoke` (see `.github/HOOKS.md`), plus `pnpm add -D husky` and a `\"prepare\": \"husky\"` script so `.husky/` activates on install.",
+    "CodeScene: create the project, then wire the MCP \u2014 install the server (`brew tap codescene-oss/codescene-mcp-server https://github.com/codescene-oss/codescene-mcp-server && brew install cs-mcp`) and export `CS_ACCESS_TOKEN` (PAT from codescene.io/users/me/pat); the shipped `.mcp.json` registers it and `.claude/settings.local.json` pre-approves it, so `mcp__codescene__*` tools work on the next session. Also set `CODESCENE_PAT` + `CODESCENE_PROJECT_ID` locally and `CODESCENE_TOKEN`/`CODESCENE_PROJECT_ID` as CI secrets for the API/threshold path. `.codescene-thresholds` starts at 8.0 \u2014 a ratchet, up only.",
+    "Codacy: enable the repo and install the CLI wrapper (`.codacy/cli.sh`) or MCP, per AGENTS.md's security-scan section.",
+    "Review AGENTS.md section 2 (Product Rules) and the QA-scripts reference: they carry Tolaria's product specifics (demo-vault hygiene, shadcn/ui table, WKWebView notes, `~/.openclaw/skills/tolaria-qa` scripts) \u2014 adapt or prune them for this project.",
+    "Copy `.env.example` to `.env.local` and fill what applies (Sentry, PostHog, Lara i18n); mirror release values into GitHub Actions secrets.",
+    "If you enabled the Todoist loop: export `TODOIST_API_KEY` and verify the four section IDs baked into `.claude/commands/laputa-*.md`.",
+    "Chunk sidecars are optional: without the `chunk` CLI the pre-push hook runs everything locally; see `.chunk/README.md` to enable the fast remote lanes."
+  ],
+  "session_start": []
+}
