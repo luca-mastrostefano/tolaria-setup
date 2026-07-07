@@ -1,6 +1,6 @@
 {
   "name": "tolaria-setup",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tolaria's agent-native engineering setup as a profile: direct-to-main TDD with a two-tier husky gate (lint pre-commit; build+coverage+smoke+CodeScene pre-push), ratcheted CodeScene thresholds, Codacy/Semgrep scans, an ADR system with /create-adr, Chunk sidecar lanes, and Todoist task-loop commands. Extracted from github.com/refactoringhq/tolaria.",
   "tags": [
     "tauri",
@@ -68,5 +68,7 @@
     "If you enabled the Todoist loop: export `TODOIST_API_KEY` and verify the four section IDs baked into `.claude/commands/laputa-*.md`.",
     "Chunk sidecars are optional: without the `chunk` CLI the pre-push hook runs everything locally; see `.chunk/README.md` to enable the fast remote lanes."
   ],
-  "session_start": []
+  "session_start": [
+    "[ ! -d .husky ] || [ \"$(git config core.hooksPath 2>/dev/null)\" = \".husky\" ] || echo 'WARNING tolaria-setup: git hooks are NOT armed - the pre-commit/pre-push gates described in AGENTS.md will not run. Wire them now: pnpm add -D husky; add a prepare=husky script to package.json; pnpm install.'"
+  ]
 }
