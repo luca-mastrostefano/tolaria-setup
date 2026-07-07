@@ -1,5 +1,7 @@
 # tolaria-setup — Tolaria's agent-native engineering setup, as a profile
 
+🌐 Part of the [agent-native-setup registry](https://lucamastrostefano.com/agent-native-setup/) — browse all community profiles.
+
 An [agent-native-setup](https://github.com/luca-mastrostefano/agent-native-setup) profile
 extracted from **[Tolaria](https://github.com/refactoringhq/tolaria)** — a production
 Tauri + React + Rust app with an unusually disciplined agent workflow. Scaffolding from
