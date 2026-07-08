@@ -1,6 +1,6 @@
 {
   "name": "tolaria-setup",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Tolaria's agent-native engineering setup as a profile: direct-to-main TDD with a two-tier husky gate (lint pre-commit; build+coverage+smoke+CodeScene pre-push), ratcheted CodeScene thresholds, Codacy/Semgrep scans, an ADR system with /create-adr, Chunk sidecar lanes, and Todoist task-loop commands. Extracted from github.com/refactoringhq/tolaria.",
   "tags": [
     "tauri",
@@ -21,6 +21,7 @@
     "docs/adr/README.md",
     ".codescene-thresholds",
     ".env.example",
+    ".gitignore",
     "release-notes/TEMPLATE.md"
   ],
   "prompts": [
@@ -70,6 +71,6 @@
     "Chunk sidecars are optional: without the `chunk` CLI the pre-push hook runs everything locally; see `.chunk/README.md` to enable the fast remote lanes."
   ],
   "session_start": [
-    "[ ! -d .husky ] || [ \"$(git config core.hooksPath 2>/dev/null)\" = \".husky\" ] || echo 'WARNING tolaria-setup: git hooks are NOT armed - the pre-commit/pre-push gates described in AGENTS.md will not run. Wire them now: pnpm add -D husky; add a prepare=husky script to package.json; pnpm install.'"
+    "hp=\"$(git config core.hooksPath 2>/dev/null)\"; [ ! -d .husky ] || [ \"$hp\" = \".husky\" ] || [ \"$hp\" = \".husky/_\" ] || echo 'WARNING tolaria-setup: git hooks are NOT armed - the pre-commit/pre-push gates described in AGENTS.md will not run. Wire them now: pnpm add -D husky; add a prepare=husky script to package.json; pnpm install.'"
   ]
 }
