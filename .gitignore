@@ -1,0 +1,6 @@
+# `.claude/settings.local.json` is commonly excluded by a global git ignore
+# (e.g. ~/.config/git/ignore has `**/.claude/settings.local.json`). This profile
+# intentionally SHIPS that file as a template — templates/.claude/settings.local.json
+# pre-approves the CodeScene MCP for scaffolded projects — so re-include it here and
+# keep it tracked. Without this negation it silently never gets committed.
+!templates/.claude/settings.local.json
