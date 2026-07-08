@@ -1,6 +1,6 @@
 {
   "name": "tolaria-setup",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Tolaria's agent-native engineering setup as a profile: direct-to-main TDD with a two-tier husky gate (lint pre-commit; build+coverage+smoke+CodeScene pre-push), ratcheted CodeScene thresholds, Codacy/Semgrep scans, an ADR system with /create-adr, Chunk sidecar lanes, and Todoist task-loop commands. Extracted from github.com/refactoringhq/tolaria.",
   "tags": [
     "tauri",

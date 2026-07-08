@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__codescene__*",
+      "Read(*)",
+      "Bash(cat*)",
+      "Bash(ls*)",
+      "Write(*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "codescene"
+  ]
+}
