@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+build/
+target/
+src-tauri/target/
+
+# Local env & secrets — see .env.example (copy to .env.local; these are never committed)
+*.local
+.env
+.env.local
+.env.*.local
+
+# Test / QA artifacts
+coverage/
+test-results/
+playwright-report/
+playwright/.cache/
+blob-report/
+
+# OS / editor
+.DS_Store
+*.log
