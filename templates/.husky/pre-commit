@@ -21,6 +21,14 @@ ensure_node_tooling() {
   fi
 }
 
+# A freshly scaffolded repo has no app yet — don't demand node/pnpm (or lint with them)
+# until there's a package.json defining the scripts this hook calls.
+if [ ! -f package.json ]; then
+  echo "🔍 Pre-commit: no package.json yet — app checks skipped"
+  echo "✅ Pre-commit passed"
+  exit 0
+fi
+
 ensure_node_tooling
 
 echo "🔍 Pre-commit checks..."

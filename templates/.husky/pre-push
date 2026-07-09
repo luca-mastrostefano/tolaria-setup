@@ -11,6 +11,14 @@
 #
 # 2. Change detection: skips Rust checks entirely when no files under
 #    src-tauri/ changed. Saves ~1-2 min on frontend-only pushes.
+#    NOTE: change detection needs an upstream (`git rev-parse @{push}`). On the
+#    FIRST push there is none, so it can't narrow anything — see optimization 6.
+#
+# 6. Presence gate: the frontend steps run only when package.json exists and the
+#    Rust steps only when src-tauri/Cargo.toml exists; with neither, the hook is a
+#    no-op. Without this, a freshly scaffolded repo's first push would run a
+#    cold-cache full `cargo llvm-cov` (~8 min) — or hard-fail for want of cargo —
+#    over a tree with no code in it.
 #
 # 3. Merged redundant test runs: frontend coverage (step 2) already runs
 #    all tests, so the separate test step was removed.
@@ -98,7 +106,26 @@ else
   PUSH_INPUT=$(cat)
 fi
 require_main_push
-ensure_node_tooling
+
+# ── Presence gate ───────────────────────────────────────────────────────
+# What does this repo actually contain? A freshly scaffolded project has no app yet, and on
+# the FIRST push git has no upstream, so `@{push}` is empty and the change-detection below
+# cannot narrow anything — every flag stays `true`. Without this gate the very first push
+# runs the whole suite, including a cold-cache instrumented `cargo llvm-cov` (~8 min, see
+# the header), over a tree with no code in it — or hard-fails in ensure_cargo_tooling on a
+# project that has no Rust at all. Gate on the manifests actually existing.
+NODE_PRESENT=false
+[ -f package.json ] && NODE_PRESENT=true
+RUST_PRESENT=false
+[ -f src-tauri/Cargo.toml ] && RUST_PRESENT=true
+
+if [ "$NODE_PRESENT" = false ] && [ "$RUST_PRESENT" = false ]; then
+  echo ""
+  echo "⏭️  Pre-push: no app yet (no package.json, no src-tauri/Cargo.toml) — nothing to gate."
+  exit 0
+fi
+
+[ "$NODE_PRESENT" = false ] || ensure_node_tooling
 
 START_TIME=$(date +%s)
 
@@ -131,6 +158,10 @@ if [ -n "$PUSH_TARGET" ]; then
     esac
   done
 fi
+
+# No Rust in the tree ⇒ never run the Rust gate. This also covers the first push, where
+# PUSH_TARGET is empty and RUST_CHANGED would otherwise keep its `true` default.
+[ "$RUST_PRESENT" = true ] || RUST_CHANGED=false
 
 if [ "$APP_CHANGED" = false ]; then
   if [ "$SITE_CHANGED" = true ]; then
@@ -178,25 +209,31 @@ run_sidecar_automatic_checks() {
 }
 
 if ! run_sidecar_automatic_checks; then
-  ensure_cargo_tooling
+  # Only demand a Rust toolchain when the Rust gate below will actually run.
+  [ "$RUST_CHANGED" = false ] || ensure_cargo_tooling
 
-  # ── 0. Frontend lint ───────────────────────────────────────────────────
-  echo ""
-  echo "🔎 [0/6] Frontend lint..."
-  pnpm lint
-  echo "  ✅ Lint OK"
+  if [ "$NODE_PRESENT" = true ]; then
+    # ── 0. Frontend lint ─────────────────────────────────────────────────
+    echo ""
+    echo "🔎 [0/6] Frontend lint..."
+    pnpm lint
+    echo "  ✅ Lint OK"
 
-  # ── 1. TypeScript + Vite build ──────────────────────────────────────────
-  echo ""
-  echo "📦 [1/6] TypeScript + Vite build..."
-  pnpm build
-  echo "  ✅ Build OK"
+    # ── 1. TypeScript + Vite build ────────────────────────────────────────
+    echo ""
+    echo "📦 [1/6] TypeScript + Vite build..."
+    pnpm build
+    echo "  ✅ Build OK"
 
-  # ── 2. Frontend coverage (≥70%) — includes all unit tests ───────────────
-  echo ""
-  echo "📊 [2/6] Frontend tests + coverage (≥70%)..."
-  pnpm test:coverage --silent
-  echo "  ✅ Frontend coverage OK"
+    # ── 2. Frontend coverage (≥70%) — includes all unit tests ─────────────
+    echo ""
+    echo "📊 [2/6] Frontend tests + coverage (≥70%)..."
+    pnpm test:coverage --silent
+    echo "  ✅ Frontend coverage OK"
+  else
+    echo ""
+    echo "⏭️  [0-2/6] Frontend lint/build/coverage — skipped (no package.json)"
+  fi
 
   # ── 3. Rust lint (clippy + fmt) — fast, run before coverage ─────────────
   echo ""
