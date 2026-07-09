@@ -1,6 +1,20 @@
 {
   "name": "tolaria-setup",
-  "version": "0.1.5",
+  "version": "0.1.6",
+  "claude_settings": {
+    "permissions": {
+      "allow": [
+        "mcp__codescene__*",
+        "Read(*)",
+        "Bash(cat*)",
+        "Bash(ls*)",
+        "Write(*)"
+      ]
+    },
+    "enabledMcpjsonServers": [
+      "codescene"
+    ]
+  },
   "description": "Tolaria's agent-native engineering setup as a profile: direct-to-main TDD with a two-tier husky gate (lint pre-commit; build+coverage+smoke+CodeScene pre-push), ratcheted CodeScene thresholds, Codacy/Semgrep scans, an ADR system with /create-adr, Chunk sidecar lanes, and Todoist task-loop commands. Extracted from github.com/refactoringhq/tolaria.",
   "tags": [
     "tauri",
@@ -65,7 +79,7 @@
     "Expect slow one-time toolchain installs — and don't pay them twice. The Rust coverage gate shells out to `cargo llvm-cov`, which needs `cargo-llvm-cov`: installing it via `cargo install` compiles it from source (minutes), so prefer a prebuilt binary (`cargo binstall cargo-llvm-cov --locked`). The CodeScene MCP install (`brew install cs-mcp`) may also build from source, and the Playwright lane downloads browser bundles. If you enable the Chunk sidecars, `.chunk/config.json` bootstraps rustup + `cargo install cargo-llvm-cov --locked` on every fresh environment — follow `.chunk/README.md` and snapshot the sidecar once it passes, or that toolchain recompiles on every run. Set `LAPUTA_PREPUSH_LOCAL=1` to bypass the sidecar and gate locally.",
     "Wire the scripts the hooks call: `package.json` needs `lint`, `test`, `test:coverage`, and `playwright:smoke` (see `.github/HOOKS.md`), plus `pnpm add -D husky` and a `\"prepare\": \"husky\"` script so `.husky/` activates on install.",
     "Playwright smoke lane: this profile ships `playwright.smoke.config.ts` and `scripts/playwright-smoke-server.mjs` — the config and dev-server that the pre-push hook and `.chunk/run-playwright-*.sh` runners require. You must still (a) `pnpm add -D @playwright/test`, (b) set `playwright:smoke` to start with the EXACT prefix `playwright test --config playwright.smoke.config.ts ` followed by your spec paths (the Chunk runner throws on any other format), and (c) write specs tagged `@smoke` into `tests/smoke/<slug>.spec.ts` per AGENTS.md. The server assumes a Vite `pnpm dev` app — adjust the spawn command if your stack differs. Until specs exist the gate is a safe no-op.",
-    "CodeScene: create the project, then wire the MCP \u2014 install the server (`brew tap codescene-oss/codescene-mcp-server https://github.com/codescene-oss/codescene-mcp-server && brew install cs-mcp`) and export `CS_ACCESS_TOKEN` (PAT from codescene.io/users/me/pat); the shipped `.mcp.json` registers it and `.claude/settings.local.json` pre-approves it, so `mcp__codescene__*` tools work on the next session. Also set `CODESCENE_PAT` + `CODESCENE_PROJECT_ID` locally and `CODESCENE_TOKEN`/`CODESCENE_PROJECT_ID` as CI secrets for the API/threshold path. `.codescene-thresholds` starts at 8.0 \u2014 a ratchet, up only.",
+    "CodeScene: create the project, then wire the MCP \u2014 install the server (`brew tap codescene-oss/codescene-mcp-server https://github.com/codescene-oss/codescene-mcp-server && brew install cs-mcp`) and export `CS_ACCESS_TOKEN` (PAT from codescene.io/users/me/pat); the shipped `.mcp.json` registers it and the profile's `claude_settings` pre-approve it (merged into `.claude/settings.json` at scaffold), so `mcp__codescene__*` tools work on the next session. Also set `CODESCENE_PAT` + `CODESCENE_PROJECT_ID` locally and `CODESCENE_TOKEN`/`CODESCENE_PROJECT_ID` as CI secrets for the API/threshold path. `.codescene-thresholds` starts at 8.0 \u2014 a ratchet, up only.",
     "Codacy: enable the repo and install the CLI wrapper (`.codacy/cli.sh`) or MCP, per AGENTS.md's security-scan section.",
     "Review AGENTS.md section 2 (Product Rules) and the QA-scripts reference: they carry Tolaria's product specifics (demo-vault hygiene, shadcn/ui table, WKWebView notes, `~/.openclaw/skills/tolaria-qa` scripts) \u2014 adapt or prune them for this project.",
     "Copy `.env.example` to `.env.local` and fill what applies (Sentry, PostHog, Lara i18n); mirror release values into GitHub Actions secrets.",

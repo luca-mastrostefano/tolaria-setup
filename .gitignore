@@ -1,6 +1,3 @@
-# `.claude/settings.local.json` is commonly excluded by a global git ignore
-# (e.g. ~/.config/git/ignore has `**/.claude/settings.local.json`). This profile
-# intentionally SHIPS that file as a template — templates/.claude/settings.local.json
-# pre-approves the CodeScene MCP for scaffolded projects — so re-include it here and
-# keep it tracked. Without this negation it silently never gets committed.
-!templates/.claude/settings.local.json
+# Nothing to ignore in the profile repo itself. (`.claude/settings.local.json` used to be
+# shipped as a template and re-included here; it is now declared via `claude_settings` in
+# profile.json, which the engine merges into the settings.json it generates.)
