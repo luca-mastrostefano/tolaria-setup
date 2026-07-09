@@ -28,9 +28,21 @@ this profile reproduces that workflow in a new repo:
 
 ## Use it
 
+**One command, no install.**
+
 ```bash
-agent-native-setup my-app -o ./my-app --profile <path-or-url-to-this-repo>
+brew install uv   # if you don't have uv yet — docs.astral.sh/uv
+uvx --from git+https://github.com/luca-mastrostefano/agent-native-setup agent-native-setup \
+  -o ./my-app --profile git+https://github.com/luca-mastrostefano/tolaria-setup.git
 ```
+
+Append `@v0.1.8` to the profile URL to pin a release. `profile validate` classifies this
+profile as **unsafe** — it ships git hooks and onboarding steps that run on your machine —
+so the wizard shows what it will do and asks you to approve before writing anything (a
+headless `-y` run needs `--allow-code`).
+
+Already have the engine installed? `agent-native-setup my-app -o ./my-app --profile
+git+https://github.com/luca-mastrostefano/tolaria-setup.git` does the same.
 
 The prompts ask about the Todoist loop; everything else lands as-is. `ONBOARDING.md` in
 the scaffolded project walks through the one-time wiring (husky + package scripts,
