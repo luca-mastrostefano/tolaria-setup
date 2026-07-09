@@ -1,0 +1,24 @@
+tolaria-setup
+Copyright (C) 2026 Luca Mastrostefano
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version. See LICENSE for the full text.
+
+Provenance
+----------
+
+The files under templates/ are derived from the Tolaria project
+(https://github.com/refactoringhq/tolaria), which is licensed under AGPL-3.0.
+They were read from the public repository and parameterized into an
+agent-native-setup profile.
+
+This project is not affiliated with, endorsed by, or maintained by Tolaria's
+authors. Because the templates are derived from AGPL-3.0 licensed work, this
+project is distributed under the same license.
+
+Releases v0.1.0 through v0.1.8 of this project were published under an MIT
+license, on the incorrect premise that the templates had been relicensed by
+their copyright holder. That premise was mistaken; those releases should be
+treated as superseded by the current AGPL-3.0 terms.
