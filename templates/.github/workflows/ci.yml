@@ -18,8 +18,28 @@ env:
   NODE_OPTIONS: --max-old-space-size=4096
 
 jobs:
+  # A freshly scaffolded repo has no app yet, but every job below invokes pnpm or cargo. Gate
+  # them on the manifests actually existing, or the first push to a new project red-Xes CI over
+  # a tree with no code. (`hashFiles()` can't be used in a job-level `if:` — it is evaluated
+  # before checkout — hence this tiny detect job.) Once the app exists this is a no-op.
+  detect:
+    name: Detect app manifests
+    runs-on: ubuntu-latest
+    outputs:
+      node: ${{ steps.manifests.outputs.node }}
+      rust: ${{ steps.manifests.outputs.rust }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: manifests
+        shell: bash
+        run: |
+          if [ -f package.json ]; then echo "node=true" >> "$GITHUB_OUTPUT"; else echo "node=false" >> "$GITHUB_OUTPUT"; fi
+          if [ -f src-tauri/Cargo.toml ]; then echo "rust=true" >> "$GITHUB_OUTPUT"; else echo "rust=false" >> "$GITHUB_OUTPUT"; fi
+
   frontend-static-quality:
     name: Frontend Static Quality Checks
+    needs: detect
+    if: needs.detect.outputs.node == 'true'
     runs-on: macos-15
 
     steps:
@@ -134,6 +154,8 @@ jobs:
 
   frontend-tests:
     name: Frontend Tests & Coverage
+    needs: detect
+    if: needs.detect.outputs.node == 'true'
     runs-on: macos-15
 
     steps:
@@ -175,6 +197,8 @@ jobs:
 
   rust-quality:
     name: Rust Tests & Quality Checks
+    needs: detect
+    if: needs.detect.outputs.rust == 'true'
     runs-on: macos-15
 
     steps:
@@ -235,7 +259,11 @@ jobs:
     # workflows already perform the full Linux/AppImage build after main
     # pushes, so this slower compatibility check stays available for PRs and
     # manual diagnostics without blocking every direct push.
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    # It builds the Tauri app, so it needs both manifests present.
+    needs: detect
+    if: >-
+      (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
+      && needs.detect.outputs.node == 'true' && needs.detect.outputs.rust == 'true'
     runs-on: ubuntu-22.04
 
     steps:

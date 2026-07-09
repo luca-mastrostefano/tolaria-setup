@@ -1,6 +1,6 @@
 {
   "name": "tolaria-setup",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "claude_settings": {
     "permissions": {
       "allow": [
