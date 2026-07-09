@@ -36,7 +36,7 @@ uvx --from git+https://github.com/luca-mastrostefano/agent-native-setup agent-na
   -o ./my-app --profile git+https://github.com/luca-mastrostefano/tolaria-setup.git
 ```
 
-Append `@v0.1.8` to the profile URL to pin a release. `profile validate` classifies this
+Append `@v0.2.0` to the profile URL to pin a release. `profile validate` classifies this
 profile as **unsafe** — it ships git hooks and onboarding steps that run on your machine —
 so the wizard shows what it will do and asks you to approve before writing anything (a
 headless `-y` run needs `--allow-code`).
@@ -63,7 +63,11 @@ CodeScene/Codacy credentials, `.env.local`, Chunk).
 
 ## Attribution
 
-The templates are derived from the Tolaria repository
-(<https://github.com/refactoringhq/tolaria>), extracted and parameterized with the
-maintainer's permission — Tolaria and this profile share the same author. This profile is
-MIT-licensed (see LICENSE); Tolaria itself is AGPL-3.0.
+The templates are derived from the publicly available Tolaria repository
+(<https://github.com/refactoringhq/tolaria>), read and parameterized into a profile. This
+project is not affiliated with, endorsed by, or maintained by Tolaria's authors.
+
+Tolaria is licensed under AGPL-3.0. The licensing of these derived templates is currently
+being clarified with Tolaria's maintainers; the `LICENSE` file in this repository may
+change as a result. If you are considering depending on this profile, be aware that its
+terms are not yet settled.
