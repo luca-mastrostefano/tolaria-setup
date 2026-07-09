@@ -1,6 +1,6 @@
 {
   "name": "tolaria-setup",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "claude_settings": {
     "permissions": {
       "allow": [
@@ -42,34 +42,34 @@
     {
       "name": "use_todoist",
       "type": "confirm",
-      "message": "Wire the Todoist task-loop commands (/laputa-next-task, /laputa-done)?",
+      "message": "Wire the Todoist task loop? /laputa-next-task pulls your highest-priority task and moves it to In Progress; /laputa-done comments, files it In Review, and picks up the next one. Needs a Todoist account and a TODOIST_API_KEY env var (https://www.todoist.com/help/articles/find-your-api-token-Jpzx9IIlB).",
       "default": false
     },
     {
       "name": "todoist_open_section",
       "type": "text",
-      "message": "Todoist section ID: Open (backlog)",
+      "message": "Todoist section ID for Open, the backlog the loop pulls from (find the IDs by listing the project's sections with the Todoist API (https://developer.todoist.com/api/v1) - they aren't shown in the web app's URL)",
       "default": "YOUR_OPEN_SECTION_ID",
       "when": "answers.use_todoist"
     },
     {
       "name": "todoist_rework_section",
       "type": "text",
-      "message": "Todoist section ID: To Rework (failed QA)",
+      "message": "Todoist section ID for To Rework — failed QA, drained before Open",
       "default": "YOUR_REWORK_SECTION_ID",
       "when": "answers.use_todoist"
     },
     {
       "name": "todoist_inprogress_section",
       "type": "text",
-      "message": "Todoist section ID: In Progress",
+      "message": "Todoist section ID for In Progress — where /laputa-next-task parks the task it claims",
       "default": "YOUR_IN_PROGRESS_SECTION_ID",
       "when": "answers.use_todoist"
     },
     {
       "name": "todoist_review_section",
       "type": "text",
-      "message": "Todoist section ID: In Review",
+      "message": "Todoist section ID for In Review — where /laputa-done files it once the push lands",
       "default": "YOUR_IN_REVIEW_SECTION_ID",
       "when": "answers.use_todoist"
     }
@@ -79,9 +79,9 @@
     "Expect slow one-time toolchain installs — and don't pay them twice. The Rust coverage gate shells out to `cargo llvm-cov`, which needs `cargo-llvm-cov`: installing it via `cargo install` compiles it from source (minutes), so prefer a prebuilt binary (`cargo binstall cargo-llvm-cov --locked`). The CodeScene MCP install (`brew install cs-mcp`) may also build from source, and the Playwright lane downloads browser bundles. If you enable the Chunk sidecars, `.chunk/config.json` bootstraps rustup + `cargo install cargo-llvm-cov --locked` on every fresh environment — follow `.chunk/README.md` and snapshot the sidecar once it passes, or that toolchain recompiles on every run. Set `LAPUTA_PREPUSH_LOCAL=1` to bypass the sidecar and gate locally.",
     "Wire the scripts the hooks call: `package.json` needs `lint`, `test`, `test:coverage`, and `playwright:smoke` (see `.github/HOOKS.md`), plus `pnpm add -D husky` and a `\"prepare\": \"husky\"` script so `.husky/` activates on install.",
     "Playwright smoke lane: this profile ships `playwright.smoke.config.ts` and `scripts/playwright-smoke-server.mjs` — the config and dev-server that the pre-push hook and `.chunk/run-playwright-*.sh` runners require. You must still (a) `pnpm add -D @playwright/test`, (b) set `playwright:smoke` to start with the EXACT prefix `playwright test --config playwright.smoke.config.ts ` followed by your spec paths (the Chunk runner throws on any other format), and (c) write specs tagged `@smoke` into `tests/smoke/<slug>.spec.ts` per AGENTS.md. The server assumes a Vite `pnpm dev` app — adjust the spawn command if your stack differs. Until specs exist the gate is a safe no-op.",
-    "CodeScene: create the project, then wire the MCP \u2014 install the server (`brew tap codescene-oss/codescene-mcp-server https://github.com/codescene-oss/codescene-mcp-server && brew install cs-mcp`) and export `CS_ACCESS_TOKEN` (PAT from codescene.io/users/me/pat); the shipped `.mcp.json` registers it and the profile's `claude_settings` pre-approve it (merged into `.claude/settings.json` at scaffold), so `mcp__codescene__*` tools work on the next session. Also set `CODESCENE_PAT` + `CODESCENE_PROJECT_ID` locally and `CODESCENE_TOKEN`/`CODESCENE_PROJECT_ID` as CI secrets for the API/threshold path. `.codescene-thresholds` starts at 8.0 \u2014 a ratchet, up only.",
+    "CodeScene: create the project, then wire the MCP — install the server (`brew tap codescene-oss/codescene-mcp-server https://github.com/codescene-oss/codescene-mcp-server && brew install cs-mcp`) and export `CS_ACCESS_TOKEN` (PAT from codescene.io/users/me/pat); the shipped `.mcp.json` registers it and the profile's `claude_settings` pre-approve it (merged into `.claude/settings.json` at scaffold), so `mcp__codescene__*` tools work on the next session. Also set `CODESCENE_PAT` + `CODESCENE_PROJECT_ID` locally and `CODESCENE_TOKEN`/`CODESCENE_PROJECT_ID` as CI secrets for the API/threshold path. `.codescene-thresholds` starts at 8.0 — a ratchet, up only.",
     "Codacy: enable the repo and install the CLI wrapper (`.codacy/cli.sh`) or MCP, per AGENTS.md's security-scan section.",
-    "Review AGENTS.md section 2 (Product Rules) and the QA-scripts reference: they carry Tolaria's product specifics (demo-vault hygiene, shadcn/ui table, WKWebView notes, `~/.openclaw/skills/tolaria-qa` scripts) \u2014 adapt or prune them for this project.",
+    "Review AGENTS.md section 2 (Product Rules) and the QA-scripts reference: they carry Tolaria's product specifics (demo-vault hygiene, shadcn/ui table, WKWebView notes, `~/.openclaw/skills/tolaria-qa` scripts) — adapt or prune them for this project.",
     "Copy `.env.example` to `.env.local` and fill what applies (Sentry, PostHog, Lara i18n); mirror release values into GitHub Actions secrets.",
     "If you enabled the Todoist loop: export `TODOIST_API_KEY` and verify the four section IDs baked into `.claude/commands/laputa-*.md`.",
     "Chunk sidecars are optional: without the `chunk` CLI the pre-push hook runs everything locally; see `.chunk/README.md` to enable the fast remote lanes."
